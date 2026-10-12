@@ -138,6 +138,18 @@ button,input,select,textarea{font:inherit;color:inherit}
 .modal ol{margin:0 0 16px;padding-left:20px;display:flex;flex-direction:column;gap:6px}
 .modal .acts{display:flex;gap:8px;justify-content:flex-end}
 .hint{color:var(--warn);font-size:12px;line-height:1.35}
+.sub{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);font-weight:700;margin:6px 0 -2px;display:flex;align-items:center;gap:8px}
+.sub::after{content:"";flex:1;height:1px;background:var(--line)}
+.tip{font-size:11.5px;color:var(--mute);line-height:1.35}
+.own{display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-left:3px solid var(--or);border-radius:4px;padding:10px;background:rgba(239,138,0,.04)}
+.own.off{border-left-color:var(--line);background:transparent}
+.own .seg button{font-size:12px;padding:7px 4px}
+.own .acts2{display:flex;gap:6px;flex-wrap:wrap}
+.own .acts2 .btn{padding:6px 10px;font-size:12px}
+.chip.own{color:var(--or);border-color:rgba(239,138,0,.5)}
+.grp .hrow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 10px}
+.grp .hrow h3{margin:0}
+.grp .hrow .btn{padding:5px 9px;font-size:11.5px}
 .fsel{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px}
 .fsel .btn{padding:5px 10px;font-size:12px}
 .fsel .fn{font-size:12px;color:var(--or);font-weight:600;word-break:break-all}
@@ -530,8 +542,8 @@ button,input,select,textarea{font:inherit;color:inherit}
       <div class="fmts" id="fmts"></div>
     </section>
     <section class="grp">
-      <h3>Görünüm</h3>
-      <div style="display:flex;flex-direction:column;gap:10px">
+      <h3>Ortak görünüm</h3>
+      <div style="display:flex;flex-direction:column;gap:10px" id="gBox">
         <div class="fld"><label>Renk teması</label>
           <div class="seg" id="segTheme"><button type="button" data-v="dark">Koyu</button><button type="button" data-v="steel">Antrasit</button><button type="button" data-v="light">Açık</button></div>
         </div>
@@ -545,14 +557,32 @@ button,input,select,textarea{font:inherit;color:inherit}
         <div class="fld" id="fldTile"><label>Sayfa yerleşimi</label>
           <div class="seg" id="segTile"><button type="button" data-v="exact">Etiket boyutunda</button><button type="button" data-v="a4" id="bTileA4">A4'e diz + kesim</button></div>
         </div>
-        <div class="row2">
-          <div class="fld"><label for="inWeb">Alt bant web adresi</label><input id="inWeb" placeholder="www.orimak.com"></div>
-          <div class="fld"><label for="inCta">Alt bant çağrı</label><input id="inCta" placeholder="Kameranızla okutun"></div>
+        <div class="fld"><label>Logo</label>
+          <div class="seg" id="segLogo"><button type="button" data-v="1">Göster</button><button type="button" data-v="0">Gizle</button></div>
         </div>
+        <div class="sub">Etiket yazıları</div>
+        <div class="tip">Bir yazıyı silerseniz etikette o yazı görünmez. Bu ayarlar "senkron" olan tüm etiketlere uygulanır.</div>
+        <div class="row2">
+          <div class="fld"><label for="g_kick">Köşe yazısı</label><input id="g_kick" data-g="kick" placeholder="(boş = gizli)"></div>
+          <div class="fld"><label for="g_kickSub">Köşe alt satır</label><input id="g_kickSub" data-g="kickSub" placeholder="(boş = gizli)"></div>
+        </div>
+        <div class="row2">
+          <div class="fld"><label for="g_pdfT">Katalog QR başlık</label><input id="g_pdfT" data-g="pdfT" placeholder="(boş = gizli)"></div>
+          <div class="fld"><label for="g_pdfS">Katalog QR alt yazı</label><input id="g_pdfS" data-g="pdfS" placeholder="(boş = gizli)"></div>
+        </div>
+        <div class="row2">
+          <div class="fld"><label for="g_vidT">Video QR başlık</label><input id="g_vidT" data-g="vidT" placeholder="(boş = gizli)"></div>
+          <div class="fld"><label for="g_vidS">Video QR alt yazı</label><input id="g_vidS" data-g="vidS" placeholder="(boş = gizli)"></div>
+        </div>
+        <div class="row2">
+          <div class="fld"><label for="g_cta">Alt bant çağrı</label><input id="g_cta" data-g="cta" placeholder="(boş = gizli)"></div>
+          <div class="fld"><label for="g_ctaSub">Alt bant 2. satır</label><input id="g_ctaSub" data-g="ctaSub" placeholder="(boş = gizli)"></div>
+        </div>
+        <div class="fld"><label for="g_web">Alt bant web adresi</label><input id="g_web" data-g="web" placeholder="(boş = gizli)"></div>
       </div>
     </section>
     <section class="grp">
-      <h3>Makineler</h3>
+      <div class="hrow"><h3>Makineler</h3><button class="btn" id="bSyncAll" type="button" title="Tüm etiketleri ortak görünüme bağla">Hepsini senkronla</button></div>
       <div class="mlist" id="mlist"></div>
       <div style="height:10px"></div>
       <button class="add" id="bAdd" type="button" style="width:100%">+ Makine ekle</button>
@@ -2918,6 +2948,7 @@ const KEY="orimak_qr_katalog_v1";
 const uid=()=>Math.random().toString(36).slice(2,9);
 const DEFAULT={
   fmt:"lp",theme:"dark",tile:"exact",content:"full",qr:"both",base:"",web:"www.orimak.com",cta:"Kameranızla okutun",
+  ctaSub:"Scan with your phone camera",kick:"QR Katalog",kickSub:"Scan · Okut",pdfT:"Katalog",pdfS:"PDF · Catalogue",vidT:"Video",vidS:"İzle · Watch",logo:true,
   machines:[
     {id:uid(),on:true,ex:true,code:"SW1300",name:"Panel Temizleme Makinesi",desc:"Fortran SW1300 · otomatik panel yüzey temizleme",pdf:"https://www.orimak.com/katalog/sw1300.pdf",video:"https://www.youtube.com/watch?v=ORNEK01",img:""},
     {id:uid(),on:true,ex:true,code:"ORİTEQ",name:"Karton Kutu Kesim Hattı",desc:"FEFCO kutu tipleri için hızlı kesim ve bigleme",pdf:"https://www.orimak.com/katalog/oriteq.pdf",video:"https://www.youtube.com/watch?v=ORNEK02",img:""},
@@ -2925,6 +2956,12 @@ const DEFAULT={
   ]
 };
 let S=load();
+/* Etiket başına ayarlar: senkron (ortak) ya da etikete özel */
+const SKEYS=["theme","content","qr","logo","kick","kickSub","pdfT","pdfS","vidT","vidS","cta","ctaSub","web"];
+const isOwn=m=>m&&m.sync===false&&m.own;
+function eff(m){const E={};SKEYS.forEach(k=>{E[k]=isOwn(m)&&m.own[k]!==undefined?m.own[k]:S[k];});return E;}
+function snap(){const o={};SKEYS.forEach(k=>o[k]=S[k]);return o;}
+const G=()=>eff(null);
 let openId=S.machines[0]?S.machines[0].id:null;
 let zoomMode="fit";
 
@@ -2965,20 +3002,22 @@ const IC={
   vid:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>',
   cam:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M3 8h4l2-3h6l2 3h4v12H3z"/><circle cx="12" cy="13.5" r="3.6"/></svg>'
 };
-function tile(kind,url){
-  const lab=kind==="pdf"?["Katalog","PDF · Catalogue"]:["Video","İzle · Watch"];
+function tile(kind,url,E){
+  E=E||G();
+  const lab=kind==="pdf"?[E.pdfT,E.pdfS]:[E.vidT,E.vidS];
   const has=okUrl(url);
-  return `<div class="qt ${kind}${has?"":" miss"}"><div class="card">${has?qrSVG(url)+'<i class="br a"></i><i class="br b"></i>':"Link<br>eklenmedi"}</div><div class="lab"><span class="ico">${IC[kind]}</span><span class="t"><b>${lab[0]}</b><small>${lab[1]}</small></span></div></div>`;
+  const t=(lab[0]||lab[1])?`<span class="t">${lab[0]?`<b>${esc(lab[0])}</b>`:""}${lab[1]?`<small>${esc(lab[1])}</small>`:""}</span>`:"";
+  return `<div class="qt ${kind}${has?"":" miss"}"><div class="card">${has?qrSVG(url)+'<i class="br a"></i><i class="br b"></i>':"Link<br>eklenmedi"}</div><div class="lab"><span class="ico">${IC[kind]}</span>${t}</div></div>`;
 }
 function kindsFor(m){
-  const p=okUrl(m.pdf),v=okUrl(m.video);
-  if(S.qr==="pdf")return ["pdf"];
-  if(S.qr==="vid")return ["vid"];
+  const p=okUrl(m.pdf),v=okUrl(m.video),q=eff(m).qr;
+  if(q==="pdf")return ["pdf"];
+  if(q==="vid")return ["vid"];
   const k=[];if(p)k.push("pdf");if(v)k.push("vid");
   return k.length?k:["pdf","vid"];
 }
-function qrBlock(m,kinds){
-  return `<div class="qrs${kinds.length===1?" one":""}">${kinds.map(k=>tile(k,k==="pdf"?m.pdf:m.video)).join("")}</div>`;
+function qrBlock(m,kinds,E){
+  return `<div class="qrs${kinds.length===1?" one":""}">${kinds.map(k=>tile(k,k==="pdf"?m.pdf:m.video,E)).join("")}</div>`;
 }
 /* Dekor: logodaki 45° kırılımı tekrarlayan turuncu köşe + ince çizgi */
 function deco(w,h,size,th){
@@ -2987,28 +3026,34 @@ function deco(w,h,size,th){
   return `<svg class="deco" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polygon points="${w-size},0 ${w},0 ${w},${size}" fill="#ef8a00"/><polygon points="${w-size*1.2},0 ${w-size*1.12},0 ${w},${size*1.12} ${w},${size*1.2}" fill="#ef8a00"/><polygon points="0,${h-size*1.5} ${size*1.5},${h} 0,${h}" fill="${lc}"/></svg>`;
 }
 const RIV='<i class="rv a"></i><i class="rv b"></i><i class="rv c"></i><i class="rv d"></i>';
-function foot(){
-  return `<div class="foot">${IC.cam}<div class="tx"><b>${esc(S.cta||"Kameranızla okutun")}</b>Scan with your phone camera</div><span class="web">${esc(S.web||"")}</span></div>`;
+function foot(E){
+  E=E||G();
+  return `<div class="foot">${IC.cam}<div class="tx">${E.cta?`<b>${esc(E.cta)}</b>`:""}${esc(E.ctaSub||"")}</div>${E.web?`<span class="web">${esc(E.web)}</span>`:""}</div>`;
 }
-function head(th){return `<img class="logo" src="${th==="light"?LOGO_LIGHT:LOGO_DARK}" alt="ORİMAK">`;}
-function kick(){return `<div class="kick">QR<br>Katalog<small>Scan · Okut</small></div>`;}
+function head(th,E){E=E||G();return E.logo===false?"":`<img class="logo" src="${th==="light"?LOGO_LIGHT:LOGO_DARK}" alt="ORİMAK">`;}
+function kick(E){
+  E=E||G();if(!E.kick&&!E.kickSub)return "";
+  return `<div class="kick">${esc(E.kick||"").trim().split(/\s+/).filter(Boolean).join("<br>")}${E.kickSub?`<small>${esc(E.kickSub)}</small>`:""}</div>`;
+}
 function ttl(m,extra){
-  return `<div class="ttl ${extra||""}">${m.code?`<span class="code">${esc(m.code)}</span>`:""}<h2 class="fit">${esc(m.name||"Makine adı")}</h2>${m.desc?`<p class="desc fit">${esc(m.desc)}</p>`:""}</div>`;
+  return `<div class="ttl ${extra||""}">${m.code?`<span class="code">${esc(m.code)}</span>`:""}${m.name?`<h2 class="fit">${esc(m.name)}</h2>`:""}${m.desc?`<p class="desc fit">${esc(m.desc)}</p>`:""}</div>`;
 }
-function cls(fmt,th){return `sheet f-${fmt} ${th} c-${S.content||"full"}`;}
+function cls(fmt,th,E){return `sheet f-${fmt} ${th} c-${(E||G()).content||"full"}`;}
 function label(m,fmt,th,kinds){
-  const F=FORMATS[fmt];
-  return `<section class="${cls(fmt,th)}">${deco(F.w,F.h,F.deco,th)}${F.round?"":RIV}${head(th)}${F.kick?kick():""}${ttl(m)}${qrBlock(m,kinds)}${F.foot?foot():""}</section>`;
+  const F=FORMATS[fmt],E=eff(m);th=E.theme;
+  return `<section class="${cls(fmt,th,E)}">${deco(F.w,F.h,F.deco,th)}${F.round?"":RIV}${head(th,E)}${F.kick?kick(E):""}${ttl(m)}${qrBlock(m,kinds,E)}${F.foot?foot(E):""}</section>`;
 }
 function poster(m,th,kinds){
+  th=eff(m).theme;
   return `<section class="sheet ${th} a3w" style="width:297mm;height:420mm"><div class="a3in">${label(m,"a5",th,kinds)}</div></section>`;
 }
 function single(m,th,kinds){
+  const E=eff(m);th=E.theme;
   const ph=m.img?`<div class="ph" style="background-image:url('${m.img}')"></div>`:"";
-  return `<section class="${cls("tl",th)}">${deco(297,210,100,th)}${RIV}${head(th)}${kick()}${ttl(m,m.img?"withph":"")}${ph}${qrBlock(m,kinds)}${foot()}</section>`;
+  return `<section class="${cls("tl",th,E)}">${deco(297,210,100,th)}${RIV}${head(th,E)}${kick(E)}${ttl(m,m.img?"withph":"")}${ph}${qrBlock(m,kinds,E)}${foot(E)}</section>`;
 }
 function listPage(ms,start,total,pg,pgs,th){
-  const rows=ms.map((m,i)=>`<div class="rw"><span class="n">${String(start+i+1).padStart(2,"0")}</span>${m.img?`<div class="th" style="background-image:url('${m.img}')"></div>`:""}${ttl(m)}<div class="qrs">${(S.qr==="both"?["pdf","vid"]:[S.qr]).map(k=>tile(k,k==="pdf"?m.pdf:m.video)).join("")}</div></div>`).join("");
+  const rows=ms.map((m,i)=>{const E=eff(m);return `<div class="rw"><span class="n">${String(start+i+1).padStart(2,"0")}</span>${m.img?`<div class="th" style="background-image:url('${m.img}')"></div>`:""}${ttl(m)}<div class="qrs">${(E.qr==="both"?["pdf","vid"]:[E.qr]).map(k=>tile(k,k==="pdf"?m.pdf:m.video,E)).join("")}</div></div>`;}).join("");
   return `<section class="${cls("tp",th)}">${deco(210,297,48,th)}${RIV}${head(th)}${kick()}<div class="hd"><b>Ürün Kataloğu</b><span>Product catalogue</span><i>${total} makine${pgs>1?` · ${pg}/${pgs}`:""}</i></div><div class="rows">${rows}</div>${foot()}</section>`;
 }
 function tileFit(F){
@@ -3027,7 +3072,7 @@ function buildSheets(){
   if(F.kind==="label"){
     const items=[];
     ms.forEach(m=>{const k=kindsFor(m);if(F.single&&k.length>1)k.forEach(x=>items.push({m,k:[x]}));else items.push({m,k});});
-    const labels=items.map(it=>({html:S.fmt==="a3"?poster(it.m,th,it.k):label(it.m,S.fmt,th,it.k),m:it.m,cap:it.m.name+(F.single?(it.k[0]==="pdf"?" · Katalog":" · Video"):"")}));
+    const labels=items.map(it=>({html:S.fmt==="a3"?poster(it.m,th,it.k):label(it.m,S.fmt,th,it.k),m:it.m,cap:(it.m.name||it.m.code||"Adsız")+(F.single?(it.k[0]==="pdf"?" · Katalog":" · Video"):"")}));
     const T=tileFit(F);
     if(S.tile==="exact"||!T.per){labels.forEach(l=>out.push({html:l.html,cap:l.cap}));}
     else{
@@ -3047,7 +3092,7 @@ function buildSheets(){
         out.push({html:`<section class="sheet a4" style="width:${pw}mm;height:${ph}mm">${h}</section>`,cap:`A4 sayfa ${out.length+1} · ${Math.min(per,labels.length-i)} etiket`});
       }
     }
-  }else if(F.kind==="single"){ms.forEach(m=>out.push({html:single(m,th,kindsFor(m)),cap:m.name}));}
+  }else if(F.kind==="single"){ms.forEach(m=>out.push({html:single(m,th,kindsFor(m)),cap:m.name||m.code||"Adsız"}));}
   else{
     const per=4,pgs=Math.ceil(ms.length/per);
     for(let i=0;i<ms.length;i+=per)out.push({html:listPage(ms.slice(i,i+per),i,ms.length,i/per+1,pgs,th),cap:`Sayfa ${i/per+1}`});
@@ -3105,8 +3150,32 @@ function renderFormats(){
   const F=FORMATS[S.fmt];
   document.getElementById("fldTile").hidden=F.kind!=="label"||!tileFit(F).per;
   if(F.kind==="label"&&tileFit(F).per)document.getElementById("bTileA4").textContent=`A4'e diz (${tileFit(F).per}/sayfa)`;
-  document.getElementById("qrHint").hidden=!(F.single&&S.qr==="both");
+  document.getElementById("qrHint").hidden=!(F.single&&(S.qr==="both"||S.machines.some(m=>m.on&&eff(m).qr==="both")));
+  segSet("segLogo",S.logo===false?"0":"1");
   segSet("segTheme",S.theme);segSet("segTile",S.tile);segSet("segContent",S.content);segSet("segQr",S.qr);
+}
+function oseg(m,k,opts){
+  const v=String(eff(m)[k]);
+  return `<div class="seg">${opts.map(([val,t])=>`<button type="button" data-act="oset" data-k="${k}" data-v="${val}" aria-pressed="${v===String(val)}">${t}</button>`).join("")}</div>`;
+}
+function otxt(m,k,lab){const E=eff(m);return `<div class="fld"><label for="o_${k}_${m.id}">${lab}</label><input id="o_${k}_${m.id}" data-o="${k}" value="${esc(E[k])}" placeholder="(boş = gizli)"></div>`;}
+function ownPanel(m){
+  const own=isOwn(m);
+  let h=`<div class="own${own?"":" off"}"><div class="fld"><label>Bu etiketin görünümü</label>
+    <div class="seg"><button type="button" data-act="sync" data-v="1" aria-pressed="${!own}">Senkron (ortak)</button><button type="button" data-act="sync" data-v="0" aria-pressed="${!!own}">Bu etikete özel</button></div></div>`;
+  if(!own){return h+`<div class="tip">Soldaki "Ortak görünüm" ayarlarını kullanır. Ortak ayarı değiştirdiğinizde bu etiket de değişir.</div></div>`;}
+  h+=`<div class="tip">Bu etiket ortak ayarlardan bağımsız. Ortak ayarları değiştirmek bu etiketi etkilemez.</div>
+    <div class="fld"><label>Renk teması</label>${oseg(m,"theme",[["dark","Koyu"],["steel","Antrasit"],["light","Açık"]])}</div>
+    <div class="fld"><label>İçerik</label>${oseg(m,"content",[["full","Tam"],["sade","Sade"],["min","Minimal"]])}</div>
+    <div class="fld"><label>Basılacak QR</label>${oseg(m,"qr",[["both","Katalog + Video"],["pdf","Katalog"],["vid","Video"]])}</div>
+    <div class="fld"><label>Logo</label>${oseg(m,"logo",[["true","Göster"],["false","Gizle"]])}</div>
+    <div class="row2">${otxt(m,"kick","Köşe yazısı")}${otxt(m,"kickSub","Köşe alt satır")}</div>
+    <div class="row2">${otxt(m,"pdfT","Katalog başlık")}${otxt(m,"pdfS","Katalog alt yazı")}</div>
+    <div class="row2">${otxt(m,"vidT","Video başlık")}${otxt(m,"vidS","Video alt yazı")}</div>
+    <div class="row2">${otxt(m,"cta","Alt bant çağrı")}${otxt(m,"ctaSub","Alt bant 2. satır")}</div>
+    ${otxt(m,"web","Alt bant web adresi")}
+    <div class="acts2"><button class="btn" type="button" data-act="oreset" title="Ortak ayarları bu etikete kopyala">Ortak ayarları al</button><button class="btn" type="button" data-act="oall" title="Bu etiketin ayarlarını ortak ayar yap ve tüm etiketleri senkronla">Bunu hepsine uygula</button></div>`;
+  return h+`</div>`;
 }
 function segSet(id,v){document.querySelectorAll(`#${id} button`).forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===v));}
 function stat(u){if(!(u||"").trim())return `<span class="st" style="color:var(--mute)">boş</span>`;return okUrl(u)?`<span class="st" style="color:var(--ok)">✓ QR</span>`:`<span class="st" style="color:#ff8a7a">hatalı</span>`;}
@@ -3116,14 +3185,15 @@ function renderList(){
     const o=m.id===openId;
     const links=(okUrl(m.pdf)?1:0)+(okUrl(m.video)?1:0);
     return `<div class="mc${o?" open":""}" data-id="${m.id}">
-      <div class="mc-h" data-act="toggle"><span class="num">${String(i+1).padStart(2,"0")}</span><span class="nm"><b>${esc(m.name||"Adsız makine")}</b><small>${esc(m.code||"—")}</small></span>${m.ex?'<span class="chip ex" title="Örnek veri — kendi bilgilerinizi girin">Örnek</span>':`<span class="chip ${links?"ok":"no"}">${links} QR</span>`}<button class="tog" type="button" data-act="on" aria-pressed="${!!m.on}" title="Yazdırmaya dahil et"></button></div>
+      <div class="mc-h" data-act="toggle"><span class="num">${String(i+1).padStart(2,"0")}</span><span class="nm"><b>${esc(m.name||m.code||"Adsız makine")}</b><small>${esc(m.code||"—")}</small></span>${isOwn(m)?'<span class="chip own" title="Bu etiketin kendi ayarları var">Özel</span>':""}${m.ex?'<span class="chip ex" title="Örnek veri — kendi bilgilerinizi girin">Örnek</span>':`<span class="chip ${links?"ok":"no"}">${links} QR</span>`}<button class="tog" type="button" data-act="on" aria-pressed="${!!m.on}" title="Yazdırmaya dahil et"></button></div>
       ${o?`<div class="mc-b">
-        <div class="row2"><div class="fld"><label for="c_${m.id}">Model / kod</label><input id="c_${m.id}" data-f="code" value="${esc(m.code)}" placeholder="SW1300"></div>
+        <div class="row2"><div class="fld"><label for="c_${m.id}">Model / kod</label><input id="c_${m.id}" data-f="code" value="${esc(m.code)}" placeholder="(boş — görünmez)"></div>
         <div class="fld"><label>Görsel (isteğe bağlı)</label><div class="photo"><span class="pv" style="${m.img?`background-image:url('${m.img}')`:""}"></span><button class="btn" type="button" data-act="img">${m.img?"Değiştir":"Seç"}</button>${m.img?'<button class="btn del" type="button" data-act="noimg" title="Görseli kaldır">✕</button>':""}</div></div></div>
-        <div class="fld"><label for="n_${m.id}">Makine adı</label><input id="n_${m.id}" data-f="name" value="${esc(m.name)}" placeholder="Panel Temizleme Makinesi"></div>
-        <div class="fld"><label for="d_${m.id}">Kısa açıklama</label><textarea id="d_${m.id}" data-f="desc" placeholder="Tek satırlık öne çıkan özellik">${esc(m.desc)}</textarea></div>
+        <div class="fld"><label for="n_${m.id}">Makine adı <span style="text-transform:none;letter-spacing:0">(boş = etikette gizli)</span></label><input id="n_${m.id}" data-f="name" value="${esc(m.name)}" placeholder="(boş — etikette görünmez)"></div>
+        <div class="fld"><label for="d_${m.id}">Kısa açıklama</label><textarea id="d_${m.id}" data-f="desc" placeholder="(boş — etikette görünmez)">${esc(m.desc)}</textarea></div>
         <div class="fld lnk"><label for="p_${m.id}">Katalog PDF linki</label><input id="p_${m.id}" data-f="pdf" value="${esc(m.pdf)}" placeholder="https://…/katalog.pdf" inputmode="url">${stat(m.pdf)}${fsel(m,"pdf")}</div>
         <div class="fld lnk"><label for="v_${m.id}">Video linki</label><input id="v_${m.id}" data-f="video" value="${esc(m.video)}" placeholder="https://youtube.com/…" inputmode="url">${stat(m.video)}${fsel(m,"video")}</div>
+        ${ownPanel(m)}
         <div class="tools"><span style="display:flex;gap:6px"><button class="btn" type="button" data-act="up" title="Yukarı taşı">↑</button><button class="btn" type="button" data-act="down" title="Aşağı taşı">↓</button><button class="btn" type="button" data-act="dup">Çoğalt</button></span><button class="btn del" type="button" data-act="del">${m._del?"Emin misiniz? Sil":"Sil"}</button></div>
       </div>`:""}
     </div>`;}).join("");
@@ -3140,7 +3210,11 @@ document.getElementById("mlist").addEventListener("click",e=>{
   if(act==="on"){e.stopPropagation();m.on=!m.on;}
   if(act==="up"&&i>0){S.machines.splice(i-1,0,S.machines.splice(i,1)[0]);}
   if(act==="down"&&i<S.machines.length-1){S.machines.splice(i+1,0,S.machines.splice(i,1)[0]);}
-  if(act==="dup"){const c=Object.assign({},m,{id:uid(),name:m.name+" (kopya)"});S.machines.splice(i+1,0,c);openId=c.id;}
+  if(act==="sync"){if(a.dataset.v==="1"){m.sync=true;}else{m.sync=false;if(!m.own)m.own=snap();}m.ex=false;}
+  if(act==="oset"){const k=a.dataset.k;let v=a.dataset.v;if(k==="logo")v=v==="true";m.own[k]=v;}
+  if(act==="oreset"){m.own=snap();toast("Ortak ayarlar bu etikete kopyalandı");}
+  if(act==="oall"){const o=m.own;SKEYS.forEach(k=>{if(o[k]!==undefined)S[k]=o[k];});S.machines.forEach(q=>q.sync=true);fillGlobal();renderFormats();toast("Bu ayarlar tüm etiketlere uygulandı");}
+  if(act==="dup"){const c=Object.assign({},m,{id:uid(),name:m.name?m.name+" (kopya)":"",own:m.own?Object.assign({},m.own):undefined});S.machines.splice(i+1,0,c);openId=c.id;}
   if(act==="del"){if(!m._del){m._del=true;renderList();return;}S.machines.splice(i,1);openId=null;toast("Makine silindi");}
   if(act==="img"){imgFor=id;imgIn.click();return;}
   if(act==="noimg"){m.img="";}
@@ -3150,12 +3224,14 @@ document.getElementById("mlist").addEventListener("click",e=>{
 });
 let rT;
 document.getElementById("mlist").addEventListener("input",e=>{
+  const ok=e.target.dataset.o;
+  if(ok){const m=S.machines.find(q=>q.id===e.target.closest(".mc").dataset.id);if(isOwn(m)){m.own[ok]=e.target.value;save();clearTimeout(rT);rT=setTimeout(()=>render(false),180);}return;}
   const f=e.target.dataset.f;if(!f)return;
   const id=e.target.closest(".mc").dataset.id,m=S.machines.find(q=>q.id===id);
   m[f]=e.target.value;m.ex=false;
   if((f==="pdf"||f==="video")&&m[f+"File"]){m[f+"File"]="";delete FILES[id+"_"+f];const fs=e.target.parentElement.querySelector(".fsel");if(fs)fs.outerHTML=fsel(m,f);updFiles();}
   const card=e.target.closest(".mc");
-  if(f==="name")card.querySelector(".nm b").textContent=m.name||"Adsız makine";
+  if(f==="name"||f==="code")card.querySelector(".nm b").textContent=m.name||m.code||"Adsız makine";
   if(f==="code")card.querySelector(".nm small").textContent=m.code||"—";
   if(f==="pdf"||f==="video"){const s=e.target.parentElement.querySelector(".st");s.outerHTML=stat(m[f]);}
   const ch=card.querySelector(".chip");if(ch){const n=(okUrl(m.pdf)?1:0)+(okUrl(m.video)?1:0);ch.className="chip "+(n?"ok":"no");ch.textContent=n+" QR";ch.removeAttribute("title");}
@@ -3167,10 +3243,11 @@ document.getElementById("segContent").onclick=e=>{const b=e.target.closest("butt
 document.getElementById("segQr").onclick=e=>{const b=e.target.closest("button");if(!b)return;S.qr=b.dataset.v;save();renderFormats();render(true);};
 document.getElementById("segTheme").onclick=e=>{const b=e.target.closest("button");if(!b)return;S.theme=b.dataset.v;save();renderFormats();render(true);};
 document.getElementById("segTile").onclick=e=>{const b=e.target.closest("button");if(!b)return;S.tile=b.dataset.v;zoomMode="fit";save();renderFormats();render(true);};
-const inWeb=document.getElementById("inWeb"),inCta=document.getElementById("inCta");
-inWeb.value=S.web;inCta.value=S.cta;
-inWeb.oninput=()=>{S.web=inWeb.value;save();clearTimeout(rT);rT=setTimeout(()=>render(false),180);};
-inCta.oninput=()=>{S.cta=inCta.value;save();clearTimeout(rT);rT=setTimeout(()=>render(false),180);};
+function fillGlobal(){document.querySelectorAll("#gBox [data-g]").forEach(i=>{i.value=S[i.dataset.g]==null?"":S[i.dataset.g];});}
+fillGlobal();
+document.getElementById("gBox").addEventListener("input",e=>{const k=e.target.dataset.g;if(!k)return;S[k]=e.target.value;save();clearTimeout(rT);rT=setTimeout(()=>render(false),180);});
+document.getElementById("segLogo").onclick=e=>{const b=e.target.closest("button");if(!b)return;S.logo=b.dataset.v==="1";save();renderFormats();render(true);};
+document.getElementById("bSyncAll").onclick=()=>{const n=S.machines.filter(isOwn).length;S.machines.forEach(m=>m.sync=true);save();renderList();render(true);toast(n?`${n} etiket ortak görünüme bağlandı`:"Tüm etiketler zaten senkron");};
 document.getElementById("zr").oninput=()=>{zoomMode="manual";applyZoom();};
 document.getElementById("bFit").onclick=()=>{zoomMode="fit";applyZoom();};
 window.addEventListener("resize",()=>{if(zoomMode==="fit")applyZoom();});
@@ -3195,7 +3272,7 @@ document.getElementById("bSave").onclick=()=>{
 };
 const fOpen=document.getElementById("fOpen");
 document.getElementById("bOpen").onclick=()=>fOpen.click();
-fOpen.onchange=()=>{const f=fOpen.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const o=JSON.parse(rd.result);if(!Array.isArray(o.machines))throw 0;o.machines.forEach(m=>{m.id=m.id||uid();m.on=m.on!==false;});S=Object.assign({},DEFAULT,o);openId=S.machines[0]&&S.machines[0].id;inWeb.value=S.web;inCta.value=S.cta;save();renderFormats();renderList();render(true);toast(`${S.machines.length} makine yüklendi`);}catch(e){toast("Bu dosya bir QR katalog listesi değil");}};rd.readAsText(f);fOpen.value="";};
+fOpen.onchange=()=>{const f=fOpen.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const o=JSON.parse(rd.result);if(!Array.isArray(o.machines))throw 0;o.machines.forEach(m=>{m.id=m.id||uid();m.on=m.on!==false;});S=Object.assign({},DEFAULT,o);openId=S.machines[0]&&S.machines[0].id;fillGlobal();inBase.value=S.base||"";save();renderFormats();renderList();render(true);toast(`${S.machines.length} makine yüklendi`);}catch(e){toast("Bu dosya bir QR katalog listesi değil");}};rd.readAsText(f);fOpen.value="";};
 
 /* ---------- Linki olmayan dosyalar ---------- */
 const FILES={};let fileFor=null;
