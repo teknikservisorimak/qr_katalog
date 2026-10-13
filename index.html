@@ -139,6 +139,21 @@ button,input,select,textarea{font:inherit;color:inherit}
 .modal .acts{display:flex;gap:8px;justify-content:flex-end}
 .hint{color:var(--warn);font-size:12px;line-height:1.35}
 .qt.vcf .lab .ico{background:var(--s-fg);color:var(--s-bg)}
+/* Kişi kartı: unvan ve iletişim satırı küçük formatlarda da görünsün */
+.sheet.kisi .ttl h2{order:1}.sheet.kisi .ttl .code{order:2}.sheet.kisi .ttl .desc{order:3}
+.sheet.kisi.c-sade .code,.sheet.kisi.c-min .code{display:inline-block!important}
+.f-rd.kisi .ttl{left:10.5mm;right:10.5mm;top:40.6mm;bottom:auto;gap:.5mm}
+.f-rd.kisi.c-sade .ttl,.f-rd.kisi.c-min .ttl{top:42.5mm}
+.f-rd.kisi h2{font-size:3mm;max-height:3.4mm;white-space:nowrap}
+.f-rd.kisi .code{display:inline-block;font-size:1.75mm;border-width:.2mm;padding:.1em .4em 0}
+.f-rd.kisi .desc{display:block;font-size:1.6mm;line-height:1.2;max-height:4mm}
+.f-rd.kisi .qrs{top:10.6mm}.f-rd.kisi .qt{width:25mm}
+.f-rd.kisi.c-min .qrs{top:8mm}.f-rd.kisi.c-min .qt{width:27mm}
+.f-xs.kisi .code{display:inline-block;font-size:1.6mm;border-width:.2mm;margin-top:.4mm}
+.f-xs.kisi .desc{display:block;font-size:1.5mm;line-height:1.15;max-height:3.6mm;margin-top:.3mm}
+.f-mm.kisi .desc{display:block;font-size:1.9mm;line-height:1.2;max-height:7mm}
+.f-sq.kisi .desc{display:block;font-size:2mm;line-height:1.2;max-height:5mm}
+.f-st.kisi .desc{display:block;font-size:2.2mm;line-height:1.2;max-height:5.5mm}
 .chip.kisi{color:#7fb8ff;border-color:rgba(127,184,255,.45)}
 .addrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .addrow .add{padding:12px 6px;font-size:15px}
@@ -3117,7 +3132,7 @@ function ttl(m,extra){m=view(m);
 function cls(fmt,th,E){return `sheet f-${fmt} ${th} c-${(E||G()).content||"full"}`;}
 function label(m,fmt,th,kinds){
   const F=FORMATS[fmt],E=eff(m);th=E.theme;
-  return `<section class="${cls(fmt,th,E)}">${deco(F.w,F.h,F.deco,th)}${F.round?"":RIV}${head(th,E)}${F.kick?kick(E):""}${ttl(m)}${qrBlock(m,kinds,E)}${F.foot?foot(E):""}</section>`;
+  return `<section class="${cls(fmt,th,E)}${isK(m)?" kisi":""}">${deco(F.w,F.h,F.deco,th)}${F.round?"":RIV}${head(th,E)}${F.kick?kick(E):""}${ttl(m)}${qrBlock(m,kinds,E)}${F.foot?foot(E):""}</section>`;
 }
 function poster(m,th,kinds){
   th=eff(m).theme;
@@ -3126,7 +3141,7 @@ function poster(m,th,kinds){
 function single(m,th,kinds){
   const E=eff(m);th=E.theme;
   const ph=m.img?`<div class="ph" style="background-image:url('${m.img}')"></div>`:"";
-  return `<section class="${cls("tl",th,E)}">${deco(297,210,100,th)}${RIV}${head(th,E)}${kick(E)}${ttl(m,m.img?"withph":"")}${ph}${qrBlock(m,kinds,E)}${foot(E)}</section>`;
+  return `<section class="${cls("tl",th,E)}${isK(m)?" kisi":""}">${deco(297,210,100,th)}${RIV}${head(th,E)}${kick(E)}${ttl(m,m.img?"withph":"")}${ph}${qrBlock(m,kinds,E)}${foot(E)}</section>`;
 }
 function listPage(ms,start,total,pg,pgs,th){
   const rows=ms.map((m,i)=>{const E=eff(m);const ks=isK(m)?["vcf"]:(E.qr==="both"?["pdf","vid"]:E.qr==="none"?[]:[E.qr]).concat(E.vc?["vcf"]:[]);return `<div class="rw"><span class="n">${String(start+i+1).padStart(2,"0")}</span>${m.img?`<div class="th" style="background-image:url('${m.img}')"></div>`:""}${ttl(m)}<div class="qrs${ks.length===3?" three":""}">${ks.map(k=>tile(k,urlFor(m,k,E),E)).join("")}</div></div>`;}).join("");
